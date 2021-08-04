@@ -2,19 +2,19 @@ const path = require('path');
 
 module.exports = {
   mode: 'production',
-  entry: './src/PdfExport.tsx',
+  entry: './src/index.tsx',
   output: {
     path: path.resolve('lib'),
-    filename: 'PdfExport.js',
+    filename: 'index.js',
     libraryTarget: 'commonjs2',
   },
   module: {
     rules: [
-      {
-        test: /\.js?$/,
-        exclude: /(node_modules)/,
-        use: 'babel-loader',
-      },
+      // {
+      //   test: /\.js?$/,
+      //   exclude: /(node_modules)/,
+      //   use: 'babel-loader',
+      // },
       {
         test: /\.css$/,
         use: [
@@ -23,7 +23,7 @@ module.exports = {
         ]
       },
       {
-        test: /\.tsx?$/,
+        test: /\.(ts|tsx)?$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
         options: {
@@ -33,10 +33,12 @@ module.exports = {
     ],
   },
   resolve: {
+    modules: [path.resolve(__dirname, 'src/*')],
     alias: {
       'react': path.resolve(__dirname, './node_modules/react'),
       'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
-    }
+    },
+    extensions: ['.js', '.jsx', '.ts', '.tsx']
   },
   externals: {
     // Don't bundle react or react-dom      
