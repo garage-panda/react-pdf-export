@@ -10,11 +10,11 @@ module.exports = {
   },
   module: {
     rules: [
-      // {
-      //   test: /\.js?$/,
-      //   exclude: /(node_modules)/,
-      //   use: 'babel-loader',
-      // },
+      {
+        test: /\.js?$/,
+        exclude: /(node_modules)/,
+        use: 'babel-loader',
+      },
       {
         test: /\.css$/,
         use: [
@@ -33,7 +33,7 @@ module.exports = {
     ],
   },
   resolve: {
-    modules: [path.resolve(__dirname, 'src/*')],
+    modules: [path.resolve(__dirname, 'src/**')],
     alias: {
       'react': path.resolve(__dirname, './node_modules/react'),
       'react-dom': path.resolve(__dirname, './node_modules/react-dom'),
