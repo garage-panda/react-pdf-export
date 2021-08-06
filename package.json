@@ -32,5 +32,8 @@
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
+  },
+  "dependencies": {
+    "@garage-panda/use-await-dom-render": "0.0.3"
   }
 }
