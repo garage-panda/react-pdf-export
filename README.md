@@ -12,6 +12,8 @@ It allows you to either download or print a pdf file with your own content.
 
 ## Example
 
+[Example code in stackblitz](https://stackblitz.com/edit/react-enpvi5?file=src%2FApp.js)
+
 ## Installation
 
 Run
@@ -38,15 +40,16 @@ const App() {
 
     return (
       <React.Fragment>
-        <button onClick={generatePdf}>Click me</button>
-        <PdfExport containerRef={containerRef}>
-          <h1>This is the content of the PDF in here</h1>
-          <div>
-            <p>Yes, you can put any child</p>
-            <div>Because it's awesome!</div>
-          </div>
-        </PdfExport>
-      </React.Fragment>
+      <PdfExport containerRef={containerRef}>
+        <h1>This is the content of the PDF in here</h1>
+        <div>
+          <p>Yes, you can put any child</p>
+          <div>Because it's awesome!</div>
+        </div>
+      </PdfExport>
+      <br />
+      <button onClick={generatePdf}>Generate PDF</button>
+    </React.Fragment>
     );
 }
 
