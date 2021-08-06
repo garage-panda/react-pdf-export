@@ -1,7 +1,7 @@
 {
   "name": "@garage-panda/react-pdf-export",
-  "version": "0.0.3-alpha",
-  "description": "PDF generator for React apps",
+  "version": "0.0.4-alpha",
+  "description": "A PDF generator for React applications",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
