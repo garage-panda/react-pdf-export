@@ -1,6 +1,6 @@
 {
   "name": "@garage-panda/react-pdf-export",
-  "version": "0.0.4-alpha",
+  "version": "0.1.0",
   "description": "A PDF generator for React applications",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -34,6 +34,6 @@
     "react-dom": ">=16.8.0"
   },
   "dependencies": {
-    "@garage-panda/use-await-dom-render": "0.0.3"
+    "@garage-panda/use-await-dom-render": "0.0.5"
   }
 }

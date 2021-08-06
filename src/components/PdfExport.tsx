@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { HeadOptions } from '../types';
 import { mergeOptions } from '../utils/common-utils';
 import '../css/index.css';
-
+import { useAwaitDomRender } from "@garage-panda/use-await-dom-render";
 interface PdfExportProps {
    containerRef: {
       iframeRef: RefObject<HTMLIFrameElement>;
@@ -17,9 +17,28 @@ interface PdfExportProps {
 
 const PdfExport: React.FC<PdfExportProps> = ({ containerRef, className, showInDom = true, options, lazyLoad = false, children }) => {
 
+   const [observer, startWait] = useAwaitDomRender();
+
+   const attachObserverListener = (mountNode: Document, pdfContainer: HTMLDivElement) => {
+   
+      observer.on('load', () => {
+         observer.removeListeners();
+         containerRef.iframeRef.current.contentWindow.print();
+
+         mountNode.head.innerHTML = '';
+         mountNode.body.innerHTML = '';
+      });
+
+      startWait(pdfContainer);
+   };
+
    const populateChildren = (mountNode: Document) => {
       const pdfContainer = mountNode.createElement('div');
       mountNode.body.appendChild(pdfContainer);
+
+      if (lazyLoad) {
+         attachObserverListener(mountNode, pdfContainer);
+      }
 
       ReactDOM.render(children, pdfContainer);
    };

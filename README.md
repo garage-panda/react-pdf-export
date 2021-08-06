@@ -39,13 +39,12 @@ const App() {
     return (
       <React.Fragment>
         <button onClick={generatePdf}>Click me</button>
-        <PdfExport containerRef={containerRef} options={{
-          styles: ['https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css'],
-          scripts: ['https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js']
-        }}>
+        <PdfExport containerRef={containerRef}>
           <h1>This is the content of the PDF in here</h1>
-          <p>Yes, you can put any child</p>
-          <div>Because it's awesome!</div>
+          <div>
+            <p>Yes, you can put any child</p>
+            <div>Because it's awesome!</div>
+          </div>
         </PdfExport>
       </React.Fragment>
     );
@@ -53,6 +52,16 @@ const App() {
 
 export default App;
 ```
+
+### Available optional props
+
+| Prop      | Type        | Default                                                | Description                                                                                                                                                                                      | Optional |
+|-----------|-------------|--------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
+| className | string      | none                                                   | A custom class passed down to the iframe container                                                                                                                                               | yes      |
+| showInDom | boolean     | true                                                   | Show the preview of the PDF in the DOM                                                                                                                                                           | yes      |
+| lazyLoad  | boolean     | false                                                  | In the lazy load mode the content of the PDF is added to the DOM when you call generatePdf and is cleared afterwards. In non-lazy load the content is added to the DOM when the page is rendered | yes      |
+| options   | HeadOptions | { styles: [], scripts: [], includeParentStyles: true } | Styles and scripts loaded only in the iframe                                                                                                                                                     | yes      |
+
 
 ## Contributing
 

@@ -8,18 +8,12 @@ export default () => {
       if (!iframeRef.current) {
          return;
       };
+
       const isLazyLoad = !!populateRef.current;
-
-      if(isLazyLoad) {
-         populateRef.current();
-      }
-
-      iframeRef.current.contentWindow.print();
-
       if (isLazyLoad) {
-         const mountNode = iframeRef.current.contentWindow.document;
-         mountNode.head.innerHTML = '';
-         mountNode.body.innerHTML = '';
+         populateRef.current();
+      } else {
+         iframeRef.current.contentWindow.print();
       }
    }, [iframeRef]);
 
