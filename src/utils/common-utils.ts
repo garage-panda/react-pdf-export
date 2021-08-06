@@ -3,6 +3,7 @@ import { HeadOptions } from '../types'
 const DEFAULT_HEAD_OPTIONS: HeadOptions = {
    styles: [],
    scripts: [],
+   includeParentStyles: true,
 };
 
 export const mergeOptions = (options: HeadOptions) => {
