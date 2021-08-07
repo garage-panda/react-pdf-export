@@ -1,103 +1,104 @@
 import React, { MutableRefObject, RefObject, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import { useAwaitDomRender } from '@garage-panda/use-await-dom-render';
 import { HeadOptions } from '../types';
-import { mergeOptions } from '../utils/common-utils';
+import {
+  appendScript,
+  appendStyle,
+  cloneStyle,
+  mergeOptions,
+} from '../utils/common-utils';
 import '../css/index.css';
-import { useAwaitDomRender } from "@garage-panda/use-await-dom-render";
+
 interface PdfExportProps {
-   containerRef: {
-      iframeRef: RefObject<HTMLIFrameElement>;
-      populateRef: MutableRefObject<() => void>;
-   };
-   className?: string;
-   showInDom?: boolean;
-   options?: HeadOptions;
-   lazyLoad?: boolean;
+  containerRef: {
+    iframeRef: RefObject<HTMLIFrameElement>;
+    populateRef: MutableRefObject<() => void>;
+  };
+  className?: string;
+  showInDom?: boolean;
+  options?: HeadOptions;
+  lazyLoad?: boolean;
 }
 
-const PdfExport: React.FC<PdfExportProps> = ({ containerRef, className, showInDom = true, options, lazyLoad = false, children }) => {
+const PdfExport: React.FC<PdfExportProps> = ({
+  containerRef,
+  className,
+  showInDom = true,
+  options,
+  lazyLoad = false,
+  children,
+}) => {
+  const [observer, startWait] = useAwaitDomRender();
 
-   const [observer, startWait] = useAwaitDomRender();
+  const attachObserverListener = (
+    mountNode: Document,
+    pdfContainer: HTMLDivElement,
+  ): void => {
+    observer.on('load', () => {
+      observer.removeListeners();
+      containerRef.iframeRef.current.contentWindow.print();
 
-   const attachObserverListener = (mountNode: Document, pdfContainer: HTMLDivElement) => {
-   
-      observer.on('load', () => {
-         observer.removeListeners();
-         containerRef.iframeRef.current.contentWindow.print();
+      mountNode.head.innerHTML = '';
+      mountNode.body.innerHTML = '';
+    });
 
-         mountNode.head.innerHTML = '';
-         mountNode.body.innerHTML = '';
-      });
+    startWait(pdfContainer);
+  };
 
-      startWait(pdfContainer);
-   };
+  const populateChildren = (mountNode: Document): void => {
+    const pdfContainer = mountNode.createElement('div');
+    mountNode.body.appendChild(pdfContainer);
 
-   const populateChildren = (mountNode: Document) => {
-      const pdfContainer = mountNode.createElement('div');
-      mountNode.body.appendChild(pdfContainer);
+    if (lazyLoad) {
+      attachObserverListener(mountNode, pdfContainer);
+    }
 
-      if (lazyLoad) {
-         attachObserverListener(mountNode, pdfContainer);
-      }
+    ReactDOM.render(children, pdfContainer);
+  };
 
-      ReactDOM.render(children, pdfContainer);
-   };
+  useEffect(() => {
+    if (!lazyLoad) {
+      return;
+    }
+    const mountNode = containerRef.iframeRef.current.contentWindow.document;
+    containerRef.populateRef.current = () => {
+      populateChildren(mountNode);
+    };
+  }, [lazyLoad]);
 
-   useEffect(() => {
-      if (!lazyLoad) {
-         return;
-      }
-      const mountNode = containerRef.iframeRef.current.contentWindow.document;
-      containerRef.populateRef.current = function () { 
-         populateChildren(mountNode);
-      };
-   }, [lazyLoad])
+  useEffect(() => {
+    if (!containerRef.iframeRef.current) {
+      return;
+    }
 
-   useEffect(() => {
-      if (!containerRef.iframeRef.current) {
-         return;
-      }
+    const { includeParentStyles, styles, scripts } = mergeOptions(options);
+    const mountNode = containerRef.iframeRef.current.contentWindow.document;
 
-      const { includeParentStyles, styles, scripts} = mergeOptions(options);
+    if (includeParentStyles) {
+      const parentStyles = document.querySelectorAll('style');
+      parentStyles.forEach((style) => cloneStyle(mountNode, style));
+    }
 
-      const mountNode = containerRef.iframeRef.current.contentWindow.document;
+    styles.forEach((href) => appendStyle(mountNode, href));
+    scripts.forEach((src) => appendScript(mountNode, src));
 
-      if (includeParentStyles) {
-         const parentStyles = document.querySelectorAll("style");
-         parentStyles.forEach((style) => {
-            const clone = style.cloneNode(true);
-            mountNode.head.appendChild(clone);
-         });
-      }
-      
-      styles.forEach(styleHref => {
-         const linkElement = mountNode.createElement('link');
+    if (!lazyLoad) {
+      populateChildren(mountNode);
+    }
 
-         linkElement.type = 'text/css';
-         linkElement.rel = 'stylesheet';
-         linkElement.href = styleHref;
-         mountNode.head.appendChild(linkElement);
-      });
-      scripts.forEach(scriptSrc => {
-         const scriptElement = mountNode.createElement('script');
+    return () => {
+      mountNode.head.innerHTML = '';
+      mountNode.body.innerHTML = '';
+    };
+  }, [options]);
 
-         scriptElement.src = scriptSrc;
-         mountNode.head.appendChild(scriptElement);
-      });
-
-      if (!lazyLoad) {
-         populateChildren(mountNode);
-      }
-
-      return () => {
-         mountNode.head.innerHTML = '';
-         mountNode.body.innerHTML = '';
-      };
-   }, [options]);
-
-   return (
-      <iframe ref={containerRef.iframeRef} className={`${className} ${(!showInDom ? 'react-pdf-export-hide' : '')}`} />
-   )
-}
+  return (
+    <iframe
+      ref={containerRef.iframeRef}
+      className={`${className} ${!showInDom ? 'react-pdf-export-hide' : ''}`}
+    />
+  );
+};
 
 export default PdfExport;

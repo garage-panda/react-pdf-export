@@ -1,23 +1,27 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef } from 'react';
 
-export default () => {
-   const iframeRef = useRef<HTMLIFrameElement>();
-   const populateRef = useRef<() => void>(null);
+export default (): any => {
+  const iframeRef = useRef<HTMLIFrameElement>();
+  const populateRef = useRef<() => void>(null);
 
-   const generatePdf = useCallback(() => {
-      if (!iframeRef.current) {
-         return;
-      };
+  const generatePdf = useCallback(() => {
+    if (!iframeRef.current) {
+      return;
+    }
 
-      const isLazyLoad = !!populateRef.current;
-      if (isLazyLoad) {
-         populateRef.current();
-      } else {
-         iframeRef.current.contentWindow.print();
-      }
-   }, [iframeRef]);
+    const isLazyLoad = !!populateRef.current;
+    if (isLazyLoad) {
+      populateRef.current();
+    } else {
+      iframeRef.current.contentWindow.print();
+    }
+  }, [iframeRef]);
 
-   return { generatePdf, containerRef: {
-      iframeRef, populateRef
-   } };
-}
+  return {
+    generatePdf,
+    containerRef: {
+      iframeRef,
+      populateRef,
+    },
+  };
+};
