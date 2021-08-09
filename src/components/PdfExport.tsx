@@ -1,47 +1,104 @@
-import React, { RefObject, useEffect } from 'react';
+import React, { MutableRefObject, RefObject, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import { useAwaitDomRender } from '@garage-panda/use-await-dom-render';
 import { HeadOptions } from '../types';
-import { mergeOptions } from '../utils/common-utils';
+import {
+  appendScript,
+  appendStyle,
+  cloneStyle,
+  mergeOptions,
+} from '../utils/common-utils';
+import '../css/index.css';
 
 interface PdfExportProps {
-   containerRef: RefObject<HTMLIFrameElement>;
-   options?: HeadOptions;
+  containerRef: {
+    iframeRef: RefObject<HTMLIFrameElement>;
+    populateRef: MutableRefObject<() => void>;
+  };
+  className?: string;
+  showInDom?: boolean;
+  options?: HeadOptions;
+  lazyLoad?: boolean;
 }
 
-const PdfExport: React.FC<PdfExportProps> = ({ containerRef, options, children }) => {
-   useEffect(() => {
-      if (!containerRef.current) {
-         return;
-      }
+const PdfExport: React.FC<PdfExportProps> = ({
+  containerRef,
+  className,
+  showInDom = true,
+  options,
+  lazyLoad = false,
+  children,
+}) => {
+  const [observer, startWait] = useAwaitDomRender();
 
-      const mergedOptions = mergeOptions(options);
+  const attachObserverListener = (
+    mountNode: Document,
+    pdfContainer: HTMLDivElement,
+  ): void => {
+    observer.on('load', () => {
+      observer.removeListeners();
+      containerRef.iframeRef.current.contentWindow.print();
 
-      const mountNode = containerRef.current.contentWindow.document;
-      
-      mergedOptions.styles.forEach(styleHref => {
-         const linkElement = mountNode.createElement('link');
+      mountNode.head.innerHTML = '';
+      mountNode.body.innerHTML = '';
+    });
 
-         linkElement.type = 'text/css';
-         linkElement.rel = 'stylesheet';
-         linkElement.href = styleHref;
-         mountNode.head.appendChild(linkElement);
-      });
-      mergedOptions.scripts.forEach(scriptSrc => {
-         const scriptElement = mountNode.createElement('script');
+    startWait(pdfContainer);
+  };
 
-         scriptElement.src = scriptSrc;
-         mountNode.head.appendChild(scriptElement);
-      });
+  const populateChildren = (mountNode: Document): void => {
+    const pdfContainer = mountNode.createElement('div');
+    mountNode.body.appendChild(pdfContainer);
 
-      const pdfContainer = mountNode.createElement('div');
-      mountNode.body.appendChild(pdfContainer);
+    if (lazyLoad) {
+      attachObserverListener(mountNode, pdfContainer);
+    }
 
-      ReactDOM.render(children, pdfContainer);
-   }, [options]);
+    ReactDOM.render(children, pdfContainer);
+  };
 
-   return (
-      <iframe ref={containerRef} title='hahha' />
-   )
-}
+  useEffect(() => {
+    if (!lazyLoad) {
+      return;
+    }
+    const mountNode = containerRef.iframeRef.current.contentWindow.document;
+    containerRef.populateRef.current = () => {
+      populateChildren(mountNode);
+    };
+  }, [lazyLoad]);
+
+  useEffect(() => {
+    if (!containerRef.iframeRef.current) {
+      return;
+    }
+
+    const { includeParentStyles, styles, scripts } = mergeOptions(options);
+    const mountNode = containerRef.iframeRef.current.contentWindow.document;
+
+    if (includeParentStyles) {
+      const parentStyles = document.querySelectorAll('style');
+      parentStyles.forEach((style) => cloneStyle(mountNode, style));
+    }
+
+    styles.forEach((href) => appendStyle(mountNode, href));
+    scripts.forEach((src) => appendScript(mountNode, src));
+
+    if (!lazyLoad) {
+      populateChildren(mountNode);
+    }
+
+    return () => {
+      mountNode.head.innerHTML = '';
+      mountNode.body.innerHTML = '';
+    };
+  }, [options]);
+
+  return (
+    <iframe
+      ref={containerRef.iframeRef}
+      className={`${className} ${!showInDom ? 'react-pdf-export-hide' : ''}`}
+    />
+  );
+};
 
 export default PdfExport;
