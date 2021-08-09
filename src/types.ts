@@ -1,5 +1,5 @@
 export interface HeadOptions {
-   styles?: string[];
-   scripts?: string[];
-   includeParentStyles?: boolean;
+  styles?: string[];
+  scripts?: string[];
+  includeParentStyles?: boolean;
 }
