@@ -70,6 +70,13 @@ export default App;
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
+## Support 
+
+If you like what you see, feel free to support us!
+
+<a href="https://www.buymeacoffee.com/garage.panda">
+<img src="https://img.buymeacoffee.com/button-api/?text=Buy us a beer&emoji=:beer:&slug=garage.panda&button_colour=FFDD00&font_colour=000000&font_family=Poppins&outline_colour=000000&coffee_colour=ffffff"></a>
+
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
