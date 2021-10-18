@@ -1,6 +1,6 @@
 {
   "name": "@garage-panda/react-pdf-export",
-  "version": "0.1.2",
+  "version": "0.1.5",
   "description": "A PDF generator for React applications",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc",
+    "build": "tsc && copy src\\css\\index.css lib\\css\\index.css",
     "dev": "tsc -w"
   },
   "repository": {
