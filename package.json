@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && copy src\\css\\index.css lib\\css\\index.css",
+    "build": "tsc",
     "dev": "tsc -w"
   },
   "repository": {
