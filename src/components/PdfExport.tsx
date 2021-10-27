@@ -1,14 +1,14 @@
-import React, { MutableRefObject, RefObject, useEffect } from 'react';
-import ReactDOM from 'react-dom';
-import { useAwaitDomRender } from '@garage-panda/use-await-dom-render';
-import { HeadOptions } from '../types';
+import React, { MutableRefObject, RefObject, useEffect, useMemo } from "react";
+import ReactDOM from "react-dom";
+import { useAwaitDomRender } from "@garage-panda/use-await-dom-render";
+import { HeadOptions } from "../types";
 import {
   appendScript,
   appendStyle,
   cloneStyle,
   mergeOptions,
-} from '../utils/common-utils';
-import '../css/index.css';
+} from "../utils/common-utils";
+import "../css/index.css";
 
 interface PdfExportProps {
   containerRef: {
@@ -33,21 +33,21 @@ const PdfExport: React.FC<PdfExportProps> = ({
 
   const attachObserverListener = (
     mountNode: Document,
-    pdfContainer: HTMLDivElement,
+    pdfContainer: HTMLDivElement
   ): void => {
-    observer.on('load', () => {
+    observer.on("load", () => {
       observer.removeListeners();
       containerRef.iframeRef.current.contentWindow.print();
 
-      mountNode.head.innerHTML = '';
-      mountNode.body.innerHTML = '';
+      mountNode.head.innerHTML = "";
+      mountNode.body.innerHTML = "";
     });
 
     startWait(pdfContainer);
   };
 
   const populateChildren = (mountNode: Document): void => {
-    const pdfContainer = mountNode.createElement('div');
+    const pdfContainer = mountNode.createElement("div");
     mountNode.body.appendChild(pdfContainer);
 
     if (lazyLoad) {
@@ -76,7 +76,7 @@ const PdfExport: React.FC<PdfExportProps> = ({
     const mountNode = containerRef.iframeRef.current.contentWindow.document;
 
     if (includeParentStyles) {
-      const parentStyles = document.querySelectorAll('style');
+      const parentStyles = document.querySelectorAll("style");
       parentStyles.forEach((style) => cloneStyle(mountNode, style));
     }
 
@@ -88,15 +88,28 @@ const PdfExport: React.FC<PdfExportProps> = ({
     }
 
     return () => {
-      mountNode.head.innerHTML = '';
-      mountNode.body.innerHTML = '';
+      mountNode.head.innerHTML = "";
+      mountNode.body.innerHTML = "";
     };
   }, [options]);
+
+  const styles: React.CSSProperties = useMemo(() => {
+    if (!showInDom) {
+      return {
+        position: "absolute",
+        opacity: 0,
+        zIndex: -10,
+      };
+    }
+
+    return {};
+  }, [showInDom]);
 
   return (
     <iframe
       ref={containerRef.iframeRef}
-      className={`${className} ${!showInDom ? 'react-pdf-export-hide' : ''}`}
+      className={`${className}`}
+      style={styles}
     />
   );
 };
