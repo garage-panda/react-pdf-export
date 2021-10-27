@@ -8,7 +8,7 @@ import {
   cloneStyle,
   mergeOptions,
 } from "../utils/common-utils";
-import "../css/index.css";
+
 
 interface PdfExportProps {
   containerRef: {
