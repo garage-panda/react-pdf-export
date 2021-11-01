@@ -1,14 +1,13 @@
-import React, { MutableRefObject, RefObject, useEffect, useMemo } from "react";
-import ReactDOM from "react-dom";
-import { useAwaitDomRender } from "@garage-panda/use-await-dom-render";
-import { HeadOptions } from "../types";
+import React, { MutableRefObject, RefObject, useEffect, useMemo } from 'react';
+import ReactDOM from 'react-dom';
+import { useAwaitDomRender } from '@garage-panda/use-await-dom-render';
+import { HeadOptions } from '../types';
 import {
   appendScript,
   appendStyle,
   cloneStyle,
   mergeOptions,
-} from "../utils/common-utils";
-
+} from '../utils/common-utils';
 
 interface PdfExportProps {
   containerRef: {
@@ -35,26 +34,26 @@ const PdfExport: React.FC<PdfExportProps> = ({
     mountNode: Document,
     pdfContainer: HTMLDivElement
   ): void => {
-    observer.on("load", () => {
+    observer.on('load', () => {
       observer.removeListeners();
       containerRef.iframeRef.current.contentWindow.print();
 
-      mountNode.head.innerHTML = "";
-      mountNode.body.innerHTML = "";
+      mountNode.head.innerHTML = '';
+      mountNode.body.innerHTML = '';
     });
 
     startWait(pdfContainer);
   };
 
   const populateChildren = (mountNode: Document): void => {
-    const pdfContainer = mountNode.createElement("div");
+    const pdfContainer = mountNode.createElement('div');
     mountNode.body.appendChild(pdfContainer);
 
     if (lazyLoad) {
       attachObserverListener(mountNode, pdfContainer);
     }
 
-    ReactDOM.render(children, pdfContainer);
+    ReactDOM.render(<>{children}</>, pdfContainer);
   };
 
   useEffect(() => {
@@ -76,7 +75,7 @@ const PdfExport: React.FC<PdfExportProps> = ({
     const mountNode = containerRef.iframeRef.current.contentWindow.document;
 
     if (includeParentStyles) {
-      const parentStyles = document.querySelectorAll("style");
+      const parentStyles = document.querySelectorAll('style');
       parentStyles.forEach((style) => cloneStyle(mountNode, style));
     }
 
@@ -88,15 +87,15 @@ const PdfExport: React.FC<PdfExportProps> = ({
     }
 
     return () => {
-      mountNode.head.innerHTML = "";
-      mountNode.body.innerHTML = "";
+      mountNode.head.innerHTML = '';
+      mountNode.body.innerHTML = '';
     };
   }, [options]);
 
   const styles: React.CSSProperties = useMemo(() => {
     if (!showInDom) {
       return {
-        position: "absolute",
+        position: 'absolute',
         opacity: 0,
         zIndex: -10,
       };
